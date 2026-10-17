@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "otherworlds:block/dull_gemstone_block"
+  }
+}

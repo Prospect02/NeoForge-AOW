@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "otherworlds:dull_gemstone_block"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "otherworlds:depleted_gemstone"
+  }
+}
+
