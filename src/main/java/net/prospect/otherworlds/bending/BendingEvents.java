@@ -3,9 +3,13 @@ package net.prospect.otherworlds.bending;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.prospect.otherworlds.OtherWorlds;
+import net.prospect.otherworlds.bending.ability.AbilityManager;
+import net.prospect.otherworlds.bending.ability.EndReason;
 import net.prospect.otherworlds.bending.chi.ChiHandler;
 
 @EventBusSubscriber(modid = OtherWorlds.MODID)
@@ -13,11 +17,7 @@ public class BendingEvents {
 
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        ChiHandler.initialize(player);
-
-        OtherWorlds.LOGGER.info("[TEST] chi={} / max={} (regen {}/s)",
-                ChiHandler.round2(ChiHandler.getChi(player)), ChiHandler.getMaxChi(player), ChiHandler.getRegen(player));
+        if (event.getEntity() instanceof ServerPlayer player) ChiHandler.initialize(player);
     }
 
     @SubscribeEvent
@@ -34,11 +34,21 @@ public class BendingEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         ChiHandler.tick(player);
+        AbilityManager.tick(player);
+    }
 
-        // TEMPORARY TEST: log every 5 seconds. Delete after the checkpoint.
-        if (player.tickCount % 100 == 0) {
-            OtherWorlds.LOGGER.info("[TEST] chi={} / max={} (regen {}/s)",
-                    ChiHandler.getChi(player), ChiHandler.getMaxChi(player), ChiHandler.getRegen(player));
-        }
+    @SubscribeEvent
+    public static void onDamaged(LivingDamageEvent.Post event) {
+        if (event.getNewDamage() > 0) AbilityManager.onHurt(event.getEntity());
+    }
+
+    @SubscribeEvent
+    public static void onDeath(LivingDeathEvent event) {
+        AbilityManager.stop(event.getEntity(), EndReason.CANCELLED);
+    }
+
+    @SubscribeEvent
+    public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) AbilityManager.stop(player, EndReason.CANCELLED);
     }
 }

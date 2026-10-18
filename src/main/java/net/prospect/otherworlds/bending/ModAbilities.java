@@ -8,6 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.ability.Ability;
 import net.prospect.otherworlds.bending.ability.air.AirBlastAbility;
+import net.prospect.otherworlds.bending.ability.air.TestChannelAbility;
 
 public class ModAbilities {
     public static final ResourceKey<Registry<Ability>> ABILITY_KEY =
@@ -19,10 +20,11 @@ public class ModAbilities {
     public static final Registry<Ability> REGISTRY =
             ABILITIES.makeRegistry(builder -> builder.sync(true));
 
-    // Abilities are added here from Phase 3 onward, one line each.
-
+    // --- Air ---
     public static final DeferredHolder<Ability, AirBlastAbility> AIR_BLAST =
             ABILITIES.register("air_blast", AirBlastAbility::new);
+    public static final DeferredHolder<Ability, TestChannelAbility> TEST_CHANNEL =
+            ABILITIES.register("test_channel", TestChannelAbility::new);
 
     public static void register(IEventBus eventBus) {
         ABILITIES.register(eventBus);

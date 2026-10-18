@@ -1,3 +1,4 @@
+
 package net.prospect.otherworlds.bending.ability.air;
 
 import net.minecraft.core.particles.ParticleTypes;
@@ -7,15 +8,23 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.prospect.otherworlds.bending.ability.Ability;
-import net.prospect.otherworlds.bending.ability.AbilityContext;
+import net.prospect.otherworlds.bending.ability.*;
 import net.prospect.otherworlds.bending.style.ModBendingStyles;
 
-/** Pushes everything in front of the caster back. No damage. */
+/** Pushes everything in front of the caster back. No damage. Replaced by Breath of Wind later. */
 public class AirBlastAbility extends Ability {
 
     public AirBlastAbility() {
-        super(ModBendingStyles.AIR, 10.0, 40);   // 10 chi, 2 second cooldown
+        super(properties(ModBendingStyles.AIR)
+                .type(MoveType.PROJECTILE)
+                .difficulty(Difficulty.EASY)
+                .learning(Learning.SCROLL_OR_MASTER)
+                .comboStyle(ComboStyle.STRIKE)
+                .combo("LR")
+                .comboWindow(200)    // TEMPORARY: 10 seconds so you can type commands. Remove with real input.
+                .chiCost(10.0)
+                .cooldown(40)
+                .animation(AnimationSpec.strike("air_blast", 20, 8, true)));
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.ability.AbilityCooldowns;
+import net.prospect.otherworlds.bending.ability.CastTracker;
 import net.prospect.otherworlds.bending.data.BendingData;
 
 public class ModAttachments {
@@ -24,6 +25,11 @@ public class ModAttachments {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<AbilityCooldowns>> COOLDOWNS =
             ATTACHMENT_TYPES.register("cooldowns", () ->
                     AttachmentType.builder(AbilityCooldowns::new).build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<CastTracker>> CASTING =
+            ATTACHMENT_TYPES.register("casting", () ->
+                    AttachmentType.builder(CastTracker::new).build());
+
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
