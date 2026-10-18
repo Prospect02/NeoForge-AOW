@@ -2,20 +2,24 @@ package net.prospect.otherworlds;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.prospect.otherworlds.bending.ModAbilities;
 import net.prospect.otherworlds.bending.style.BendingStyle;
 import net.prospect.otherworlds.bending.style.ModBendingStyles;
 import net.prospect.otherworlds.block.ModBlocks;
+import net.prospect.otherworlds.client.ClientAnimations;
 import net.prospect.otherworlds.item.ModCreativeModeTabs;
 import net.prospect.otherworlds.item.ModItems;
+import net.prospect.otherworlds.network.ModNetwork;
 import net.prospect.otherworlds.registry.ModAttachments;
 import net.prospect.otherworlds.registry.ModAttributes;
 import org.slf4j.Logger;
@@ -39,6 +43,11 @@ public class OtherWorlds {
         ModCreativeModeTabs.register(modEventBus);
         ModAttachments.register(modEventBus);
         ModAttributes.register(modEventBus);
+        ModNetwork.register(modEventBus);
+
+        if  (FMLEnvironment.dist == Dist.CLIENT) {
+            ClientAnimations.register(modEventBus);
+        }
 
         NeoForge.EVENT_BUS.register(this);
 

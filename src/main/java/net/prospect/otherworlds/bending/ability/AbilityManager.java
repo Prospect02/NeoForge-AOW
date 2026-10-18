@@ -5,9 +5,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.chi.ChiHandler;
+import net.prospect.otherworlds.network.CastAnimationPayload;
+import net.prospect.otherworlds.network.CastStatePayload;
 import net.prospect.otherworlds.registry.ModAttachments;
-
+import net.prospect.otherworlds.bending.ability.Click;
 /** Every cast, from the click combo, a command, or a mob, goes through here. Server side only. */
 public class AbilityManager {
     private static final double QUALITY_FAST = 1.2;   // combo finished instantly
@@ -18,7 +22,9 @@ public class AbilityManager {
 
     /** The player route: opens the combo window. The combo then arrives through input(). */
     public static AbilityResult startCast(LivingEntity user, Ability ability) {
-        return tryUse(user, ability, 1.0, false);
+        AbilityResult result = tryUse(user, ability, 1.0, false);
+        sync(user);
+        return result;
     }
 
     /** Skips the combo, charge and impact delay. For mobs and debug commands. */
@@ -55,7 +61,11 @@ public class AbilityManager {
         ability.onCastStart(ctx(user, level, tracker, 0.0));
 
         if (skipCombo || ability.getCombo().length() == 0) {
+            playAnimation(user, ability);
             return release(user, level, tracker, 0.0);
+        }
+        if (ability.getComboStyle() == ComboStyle.CAST_ALONG) {
+            playAnimation(user, ability);   // the animation plays while the combo is entered
         }
         return AbilityResult.SUCCESS;   // combo window is open
     }
@@ -63,7 +73,12 @@ public class AbilityManager {
     // ---------- input ----------
 
     /** A left or right click from the player (or a stand-in command). */
-    public static void input(LivingEntity user, net.prospect.otherworlds.bending.ability.Click click) {
+    public static void input(LivingEntity user, Click click) {
+        handleInput(user, click);
+        sync(user);
+    }
+
+    private static void handleInput(LivingEntity user, Click click) {
         if (!(user.level() instanceof ServerLevel level)) return;
         CastTracker tracker = user.getData(ModAttachments.CASTING);
         if (!tracker.isCasting()) return;
@@ -83,6 +98,11 @@ public class AbilityManager {
                     // Faster combo = higher quality
                     double used = Mth.clamp((double) tracker.ticks / ability.getComboWindowTicks(), 0.0, 1.0);
                     tracker.quality = Mth.lerp(used, QUALITY_FAST, QUALITY_SLOW);
+
+                    // Strike moves start their animation once the combo is finished
+                    if (ability.getComboStyle() == ComboStyle.STRIKE) {
+                        playAnimation(user, ability);
+                    }
 
                     if (ability.getMaxChargeTicks() > 0) {
                         tracker.phase = CastTracker.Phase.CHARGE;
@@ -152,6 +172,7 @@ public class AbilityManager {
             // A move that fired: cleanup and cooldown
             tracker.ability.onEnd(ctx(user, level, tracker, 0.0), reason);
             startCooldown(user, level, tracker.ability, tracker.ability.getCooldownTicks());
+            stopAnimation(user);
             tracker.clear();
         } else {
             // Still in the combo, charge or impact delay: it never fired
@@ -175,6 +196,7 @@ public class AbilityManager {
             }
             startCooldown(user, level, ability, FAIL_COOLDOWN_TICKS);
         }
+        stopAnimation(user);
         tracker.clear();
     }
 
@@ -186,6 +208,42 @@ public class AbilityManager {
         }
     }
 
+    /**
+     * Tells a player's client whether clicks are being collected right now.
+     * Only sends when something changed. Called after starts, after clicks, and every tick.
+     */
+    public static void sync(LivingEntity user) {
+        if (!(user instanceof ServerPlayer player)) return;
+        CastTracker tracker = player.getData(ModAttachments.CASTING);
+
+        boolean open = tracker.isCasting()
+                && (tracker.phase == CastTracker.Phase.COMBO || tracker.phase == CastTracker.Phase.CHARGE);
+        int step = open ? tracker.step : 0;
+        if (open == tracker.sentOpen && step == tracker.sentStep) return;
+
+        tracker.sentOpen = open;
+        tracker.sentStep = step;
+        ResourceLocation id = open ? tracker.ability.getId() : OtherWorlds.id("none");
+        int total = open ? tracker.ability.getCombo().length() : 0;
+        PacketDistributor.sendToPlayer(player, new CastStatePayload(open, id, step, total));
+    }
+
+    // ---------- animation ----------
+
+    /** Tells every client that can see this entity to start the ability's animation. */
+    private static void playAnimation(LivingEntity user, Ability ability) {
+        String name = ability.getAnimation().name();
+        if (name == null || name.isEmpty()) return;
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(user,
+                new CastAnimationPayload(user.getId(), OtherWorlds.id(name), true));
+    }
+
+    /** Tells every client that can see this entity to stop its cast animation. */
+    private static void stopAnimation(LivingEntity user) {
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(user,
+                new CastAnimationPayload(user.getId(), OtherWorlds.id("none"), false));
+    }
+
     // ---------- internals ----------
 
     /** The combo (and charge) is done. Strike moves wait for their impact tick; others fire now. */
@@ -194,7 +252,6 @@ public class AbilityManager {
             tracker.charge = charge;
             tracker.phase = CastTracker.Phase.RELEASE_DELAY;
             tracker.ticks = 0;
-            // Later (animation step): this is the moment a strike move's animation starts on the client
         } else {
             release(user, level, tracker, charge);
         }
@@ -216,7 +273,7 @@ public class AbilityManager {
 
         if (ability.getCastType() == CastType.INSTANT) {
             startCooldown(user, level, ability, ability.getCooldownTicks());
-            tracker.clear();
+            tracker.clear();   // animation is left to finish on its own
         } else {
             tracker.phase = CastTracker.Phase.ACTIVE;
             tracker.ticks = 0;

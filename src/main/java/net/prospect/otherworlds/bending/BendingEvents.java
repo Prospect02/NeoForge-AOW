@@ -35,6 +35,7 @@ public class BendingEvents {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         ChiHandler.tick(player);
         AbilityManager.tick(player);
+        AbilityManager.sync(player);
     }
 
     @SubscribeEvent

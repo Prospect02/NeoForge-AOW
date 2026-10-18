@@ -21,7 +21,6 @@ public class AirBlastAbility extends Ability {
                 .learning(Learning.SCROLL_OR_MASTER)
                 .comboStyle(ComboStyle.STRIKE)
                 .combo("LR")
-                .comboWindow(200)    // TEMPORARY: 10 seconds so you can type commands. Remove with real input.
                 .chiCost(10.0)
                 .cooldown(40)
                 .animation(AnimationSpec.strike("air_blast", 20, 8, true)));

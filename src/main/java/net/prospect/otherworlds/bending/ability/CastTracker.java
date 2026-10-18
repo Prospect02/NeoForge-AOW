@@ -13,6 +13,9 @@ public class CastTracker {
     public int step;        // correct combo clicks so far
     public Phase phase = Phase.COMBO;
 
+    public boolean sentOpen;   // what the client was last told
+    public int sentStep;
+
     public boolean isCasting() {
         return ability != null;
     }
