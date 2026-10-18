@@ -18,6 +18,7 @@
   "bending_style.otherworlds.combustion": "Combustion Bending",
   "bending_style.otherworlds.seismic_vision": "Seismic Vision",
   "attribute.name.otherworlds.max_chi": "Maximum Chi",
-  "attribute.name.otherworlds.chi_regen": "Chi Regeneration"
+  "attribute.name.otherworlds.chi_regen": "Chi Regeneration",
+  "ability.otherworlds.air_blast": "Air Blast"
 }
 

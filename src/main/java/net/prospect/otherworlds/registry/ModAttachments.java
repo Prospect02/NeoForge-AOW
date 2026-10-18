@@ -6,6 +6,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.prospect.otherworlds.OtherWorlds;
+import net.prospect.otherworlds.bending.ability.AbilityCooldowns;
 import net.prospect.otherworlds.bending.data.BendingData;
 
 public class ModAttachments {
@@ -18,6 +19,11 @@ public class ModAttachments {
                             .serialize(BendingData.CODEC)  // saved with the player
                             .copyOnDeath()                 // kept when the player dies
                             .build());
+
+    // Not saved: cooldowns reset when the player relogs. Works on any living entity.
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<AbilityCooldowns>> COOLDOWNS =
+            ATTACHMENT_TYPES.register("cooldowns", () ->
+                    AttachmentType.builder(AbilityCooldowns::new).build());
 
     public static void register(IEventBus eventBus) {
         ATTACHMENT_TYPES.register(eventBus);
