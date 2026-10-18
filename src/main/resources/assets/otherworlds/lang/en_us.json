@@ -4,7 +4,18 @@
   "block.otherworlds.dull_gemstone_block": "Block of Depleted Gemstone",
   "item.otherworlds.depleted_gemstone": "Depleted Gemstone",
   "itemGroup.otherworlds.charged_gemstone_items_tab": "Avatar Other Worlds",
-  "block.otherworlds.charged_gemstone_ore": "Charged Gemstone Ore"
-
+  "block.otherworlds.charged_gemstone_ore": "Charged Gemstone Ore",
+  "bending_style.otherworlds.air": "Air Bending",
+  "bending_style.otherworlds.water": "Water Bending",
+  "bending_style.otherworlds.earth": "Earth Bending",
+  "bending_style.otherworlds.fire": "Fire Bending",
+  "bending_style.otherworlds.metal": "Metal Bending",
+  "bending_style.otherworlds.sand": "Sand Bending",
+  "bending_style.otherworlds.lava": "Lava Bending",
+  "bending_style.otherworlds.blood": "Blood Bending",
+  "bending_style.otherworlds.ice": "Ice Bending",
+  "bending_style.otherworlds.lightning": "Lightning Bending",
+  "bending_style.otherworlds.combustion": "Combustion Bending",
+  "bending_style.otherworlds.seismic_vision": "Seismic Vision"
 }
 

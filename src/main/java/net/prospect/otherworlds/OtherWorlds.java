@@ -1,6 +1,7 @@
 package net.prospect.otherworlds;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -9,6 +10,9 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.prospect.otherworlds.bending.ModAbilities;
+import net.prospect.otherworlds.bending.style.BendingStyle;
+import net.prospect.otherworlds.bending.style.ModBendingStyles;
 import net.prospect.otherworlds.block.ModBlocks;
 import net.prospect.otherworlds.item.ModCreativeModeTabs;
 import net.prospect.otherworlds.item.ModItems;
@@ -26,16 +30,14 @@ public class OtherWorlds {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
-        // Constructors
-
-        ModItems.register(modEventBus);
+        ModBendingStyles.register(modEventBus);
+        ModAbilities.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
 
         NeoForge.EVENT_BUS.register(this);
 
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
@@ -46,10 +48,15 @@ public class OtherWorlds {
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
+        for (BendingStyle style : ModBendingStyles.REGISTRY) {
+            LOGGER.info("Bending style: {} (sub-style: {})", style.getId(), style.isSubStyle());
+        }
+        LOGGER.info("Registered abilities: {}", ModAbilities.REGISTRY.keySet().size());
     }
 
+public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+}
 
 
 
