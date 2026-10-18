@@ -4,29 +4,41 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.prospect.otherworlds.OtherWorlds;
-import net.prospect.otherworlds.bending.data.BendingData;
-import net.prospect.otherworlds.registry.ModAttachments;
+import net.prospect.otherworlds.bending.chi.ChiHandler;
 
 @EventBusSubscriber(modid = OtherWorlds.MODID)
 public class BendingEvents {
 
-    // TEMPORARY TEST: replace this method in part B.
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ChiHandler.initialize(player);
 
-        BendingData data = player.getData(ModAttachments.BENDING);
+        OtherWorlds.LOGGER.info("[TEST] chi={} / max={} (regen {}/s)",
+                ChiHandler.round2(ChiHandler.getChi(player)), ChiHandler.getMaxChi(player), ChiHandler.getRegen(player));
+    }
 
-        // Temporary rolls (-1..1) so you can see them being saved
-        if (!data.rollsAssigned()) {
-            var random = player.getRandom();
-            data = data.withRolls(random.nextFloat() * 2f - 1f, random.nextFloat() * 2f - 1f);
-            player.setData(ModAttachments.BENDING, data);
+    @SubscribeEvent
+    public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) ChiHandler.onRespawn(player);
+    }
+
+    @SubscribeEvent
+    public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) ChiHandler.refreshAttributes(player);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ChiHandler.tick(player);
+
+        // TEMPORARY TEST: log every 5 seconds. Delete after the checkpoint.
+        if (player.tickCount % 100 == 0) {
+            OtherWorlds.LOGGER.info("[TEST] chi={} / max={} (regen {}/s)",
+                    ChiHandler.getChi(player), ChiHandler.getMaxChi(player), ChiHandler.getRegen(player));
         }
-
-        OtherWorlds.LOGGER.info("[TEST] {}: chi={}, maxChiRoll={}, regenRoll={}, assigned={}",
-                player.getName().getString(), data.chi(), data.maxChiRoll(),
-                data.regenRoll(), data.rollsAssigned());
     }
 }

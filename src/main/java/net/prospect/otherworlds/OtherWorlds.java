@@ -17,6 +17,7 @@ import net.prospect.otherworlds.block.ModBlocks;
 import net.prospect.otherworlds.item.ModCreativeModeTabs;
 import net.prospect.otherworlds.item.ModItems;
 import net.prospect.otherworlds.registry.ModAttachments;
+import net.prospect.otherworlds.registry.ModAttributes;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -37,6 +38,7 @@ public class OtherWorlds {
         ModItems.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
         ModAttachments.register(modEventBus);
+        ModAttributes.register(modEventBus);
 
         NeoForge.EVENT_BUS.register(this);
 
