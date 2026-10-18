@@ -9,6 +9,7 @@ import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.ability.AbilityCooldowns;
 import net.prospect.otherworlds.bending.ability.CastTracker;
 import net.prospect.otherworlds.bending.data.BendingData;
+import net.prospect.otherworlds.bending.effect.ActiveEffects;
 
 public class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =
@@ -25,6 +26,9 @@ public class ModAttachments {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<AbilityCooldowns>> COOLDOWNS =
             ATTACHMENT_TYPES.register("cooldowns", () ->
                     AttachmentType.builder(AbilityCooldowns::new).build());
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<ActiveEffects>> EFFECTS =
+            ATTACHMENT_TYPES.register("effects", () ->
+                    AttachmentType.builder(ActiveEffects::new).build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<CastTracker>> CASTING =
             ATTACHMENT_TYPES.register("casting", () ->

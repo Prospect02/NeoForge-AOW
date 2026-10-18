@@ -12,6 +12,7 @@ import net.prospect.otherworlds.network.CastAnimationPayload;
 import net.prospect.otherworlds.network.CastStatePayload;
 import net.prospect.otherworlds.registry.ModAttachments;
 import net.prospect.otherworlds.bending.ability.Click;
+
 /** Every cast, from the click combo, a command, or a mob, goes through here. Server side only. */
 public class AbilityManager {
     private static final double QUALITY_FAST = 1.2;   // combo finished instantly
@@ -78,6 +79,18 @@ public class AbilityManager {
         sync(user);
     }
 
+    /** The player let go of a click. Only matters for hold-charge moves. */
+    public static void inputRelease(LivingEntity user, Click click) {
+        OtherWorlds.LOGGER.info("[DEBUG] release received: {} phase={}", click, user.getData(ModAttachments.CASTING).phase);
+        if (!(user.level() instanceof ServerLevel level)) return;
+        CastTracker tracker = user.getData(ModAttachments.CASTING);
+        if (!tracker.isCasting() || tracker.phase != CastTracker.Phase.CHARGE) return;
+        if (!tracker.ability.isReleaseOnLetGo() || tracker.holdClick != click) return;
+
+        beginRelease(user, level, tracker, chargeFraction(tracker));
+        sync(user);
+    }
+
     private static void handleInput(LivingEntity user, Click click) {
         if (!(user.level() instanceof ServerLevel level)) return;
         CastTracker tracker = user.getData(ModAttachments.CASTING);
@@ -107,12 +120,18 @@ public class AbilityManager {
                     if (ability.getMaxChargeTicks() > 0) {
                         tracker.phase = CastTracker.Phase.CHARGE;
                         tracker.ticks = 0;
+                        if (ability.isReleaseOnLetGo()) tracker.holdClick = click;   // fires when this is let go
                     } else {
                         beginRelease(user, level, tracker, 0.0);
                     }
                 }
             }
-            case CHARGE -> beginRelease(user, level, tracker, chargeFraction(tracker));
+            case CHARGE -> {
+                // Hold-charge moves ignore further presses and fire on release instead.
+                if (!ability.isReleaseOnLetGo()) {
+                    beginRelease(user, level, tracker, chargeFraction(tracker));
+                }
+            }
             case RELEASE_DELAY, ACTIVE -> { }   // clicks do nothing here
         }
     }
@@ -232,7 +251,9 @@ public class AbilityManager {
 
     /** Tells every client that can see this entity to start the ability's animation. */
     private static void playAnimation(LivingEntity user, Ability ability) {
-        String name = ability.getAnimation().name();
+        AnimationSpec spec = ability.getAnimation();
+        if (spec == null || spec.durationTicks() <= 0) return;   // moves without an animation yet
+        String name = spec.name();
         if (name == null || name.isEmpty()) return;
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(user,
                 new CastAnimationPayload(user.getId(), OtherWorlds.id(name), true));

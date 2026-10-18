@@ -15,6 +15,8 @@ public class ModNetwork {
         PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
         registrar.playToServer(ComboClickPayload.TYPE, ComboClickPayload.STREAM_CODEC,
                 ServerPayloadHandler::onComboClick);
+        registrar.playToServer(ComboReleasePayload.TYPE, ComboReleasePayload.STREAM_CODEC,
+                ServerPayloadHandler::onComboRelease);
         registrar.playToClient(CastStatePayload.TYPE, CastStatePayload.STREAM_CODEC,
                 ClientPayloadHandler::onCastState);
         registrar.playToClient(CastAnimationPayload.TYPE, CastAnimationPayload.STREAM_CODEC,

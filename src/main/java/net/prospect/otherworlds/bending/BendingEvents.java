@@ -11,6 +11,7 @@ import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.ability.AbilityManager;
 import net.prospect.otherworlds.bending.ability.EndReason;
 import net.prospect.otherworlds.bending.chi.ChiHandler;
+import net.prospect.otherworlds.bending.effect.EffectManager;
 
 @EventBusSubscriber(modid = OtherWorlds.MODID)
 public class BendingEvents {
@@ -36,6 +37,7 @@ public class BendingEvents {
         ChiHandler.tick(player);
         AbilityManager.tick(player);
         AbilityManager.sync(player);
+        EffectManager.tick(player);
     }
 
     @SubscribeEvent

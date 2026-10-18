@@ -13,4 +13,12 @@ public class ServerPayloadHandler {
             }
         });
     }
+
+    public static void onComboRelease(ComboReleasePayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer player) {
+                AbilityManager.inputRelease(player, payload.left() ? Click.LEFT : Click.RIGHT);
+            }
+        });
+    }
 }

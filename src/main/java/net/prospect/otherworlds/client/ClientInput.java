@@ -10,6 +10,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.network.ComboClickPayload;
+import net.prospect.otherworlds.network.ComboReleasePayload;
 
 /** Turns left and right clicks into combo clicks while a cast is waiting for them. */
 @EventBusSubscriber(modid = OtherWorlds.MODID, value = Dist.CLIENT)
@@ -20,7 +21,8 @@ public class ClientInput {
     private static int graceTicks = 0;
 
     // One press = one combo click. After a click is sent, that button stays locked
-    // until the physical mouse button has been let go.
+    // until the physical mouse button has been let go. Letting go is also sent to the server,
+    // which hold-charge moves (like Wind Jump) use to fire.
     private static boolean leftLatched = false;
     private static boolean rightLatched = false;
 
@@ -57,9 +59,15 @@ public class ClientInput {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
 
-        // Unlock a button once the physical mouse button has been released.
-        if (!mc.mouseHandler.isLeftPressed()) leftLatched = false;
-        if (!mc.mouseHandler.isRightPressed()) rightLatched = false;
+        // Unlock a button once the physical mouse button has been released, and tell the server.
+        if (leftLatched && !mc.mouseHandler.isLeftPressed()) {
+            leftLatched = false;
+            PacketDistributor.sendToServer(new ComboReleasePayload(true));
+        }
+        if (rightLatched && !mc.mouseHandler.isRightPressed()) {
+            rightLatched = false;
+            PacketDistributor.sendToServer(new ComboReleasePayload(false));
+        }
 
         // Holding a button is a separate path in vanilla: it keeps breaking blocks (left) or
         // repeats the use action (right). While a cast is collecting clicks, and for a short

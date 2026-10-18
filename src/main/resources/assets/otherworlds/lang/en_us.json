@@ -20,6 +20,9 @@
   "attribute.name.otherworlds.max_chi": "Maximum Chi",
   "attribute.name.otherworlds.chi_regen": "Chi Regeneration",
   "ability.otherworlds.air_blast": "Air Blast",
-  "ability.otherworlds.test_channel": "Test Channel"
+  "ability.otherworlds.test_channel": "Test Channel",
+  "ability.otherworlds.wind_jump": "Wind Jump",
+  "ability.otherworlds.wind_run": "Wind Run",
+  "ability.otherworlds.wind_buffer": "Wind Buffer"
 }
 

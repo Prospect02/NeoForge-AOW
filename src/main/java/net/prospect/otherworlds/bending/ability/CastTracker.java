@@ -1,4 +1,5 @@
 package net.prospect.otherworlds.bending.ability;
+import net.prospect.otherworlds.bending.ability.Click;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +13,7 @@ public class CastTracker {
     public int ticks;       // ticks spent in the current phase
     public int step;        // correct combo clicks so far
     public Phase phase = Phase.COMBO;
+    @Nullable public Click holdClick;   // hold-charge moves: the click that must be let go to fire
 
     public boolean sentOpen;   // what the client was last told
     public int sentStep;
@@ -27,6 +29,7 @@ public class CastTracker {
         this.ticks = 0;
         this.step = 0;
         this.phase = Phase.COMBO;
+        this.holdClick = null;
     }
 
     public void clear() {
@@ -35,5 +38,6 @@ public class CastTracker {
         this.ticks = 0;
         this.step = 0;
         this.phase = Phase.COMBO;
+        this.holdClick = null;
     }
 }

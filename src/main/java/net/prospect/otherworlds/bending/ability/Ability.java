@@ -72,6 +72,8 @@ public abstract class Ability {
     public int getCooldownTicks() { return props.cooldownTicks; }
     /** 0 means the move has no charge phase. */
     public int getMaxChargeTicks() { return props.maxChargeTicks; }
+    /** True: the charge lasts while the last combo click is held, and letting go fires the move. */
+    public boolean isReleaseOnLetGo() { return props.releaseOnLetGo; }
     /** Share of the chi cost lost on a wrong click or timeout. */
     public double getFailChiFraction() { return props.failChiFraction; }
     public AnimationSpec getAnimation() { return props.animation; }
@@ -122,6 +124,7 @@ public abstract class Ability {
         private double chiPerTick = 0.0;
         private int cooldownTicks = 0;
         private int maxChargeTicks = 0;
+        private boolean releaseOnLetGo = false;
         private double failChiFraction = 0.25;
         private AnimationSpec animation = AnimationSpec.NONE;
 
@@ -139,8 +142,14 @@ public abstract class Ability {
         public Properties chiCost(double v) { this.chiCost = v; return this; }
         public Properties chiPerTick(double v) { this.chiPerTick = v; return this; }
         public Properties cooldown(int ticks) { this.cooldownTicks = ticks; return this; }
-        /** Adds a charge phase after the combo, up to this many ticks. */
+        /** Adds a charge phase after the combo, up to this many ticks. A further click fires it. */
         public Properties charge(int maxTicks) { this.maxChargeTicks = maxTicks; return this; }
+        /** Charge phase that lasts while the last combo click is held. Letting go fires the move. */
+        public Properties holdCharge(int maxTicks) {
+            this.maxChargeTicks = maxTicks;
+            this.releaseOnLetGo = true;
+            return this;
+        }
         public Properties failChiFraction(double v) { this.failChiFraction = v; return this; }
         public Properties animation(AnimationSpec v) { this.animation = v; return this; }
     }
