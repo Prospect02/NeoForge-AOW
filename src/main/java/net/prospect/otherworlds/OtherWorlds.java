@@ -24,6 +24,7 @@ import net.prospect.otherworlds.registry.ModAttachments;
 import net.prospect.otherworlds.registry.ModAttributes;
 import net.prospect.otherworlds.registry.ModEntities;
 import org.slf4j.Logger;
+import net.prospect.otherworlds.registry.ModSounds;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(OtherWorlds.MODID)
@@ -46,6 +47,7 @@ public class OtherWorlds {
         ModAttributes.register(modEventBus);
         ModEntities.register(modEventBus);
         ModNetwork.register(modEventBus);
+        ModSounds.register(modEventBus);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientAnimations.register(modEventBus);

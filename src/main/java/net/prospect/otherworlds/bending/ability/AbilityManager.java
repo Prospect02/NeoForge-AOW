@@ -81,7 +81,6 @@ public class AbilityManager {
 
     /** The player let go of a click. Only matters for hold-charge moves. */
     public static void inputRelease(LivingEntity user, Click click) {
-        OtherWorlds.LOGGER.info("[DEBUG] release received: {} phase={}", click, user.getData(ModAttachments.CASTING).phase);
         if (!(user.level() instanceof ServerLevel level)) return;
         CastTracker tracker = user.getData(ModAttachments.CASTING);
         if (!tracker.isCasting() || tracker.phase != CastTracker.Phase.CHARGE) return;
@@ -112,9 +111,15 @@ public class AbilityManager {
                     double used = Mth.clamp((double) tracker.ticks / ability.getComboWindowTicks(), 0.0, 1.0);
                     tracker.quality = Mth.lerp(used, QUALITY_FAST, QUALITY_SLOW);
 
-                    // Strike moves start their animation once the combo is finished
+                    // Strike moves start their animation once the combo is finished.
+                    // A move with a charge animation (Breath of Wind's inhale) starts that one instead,
+                    // and its main animation plays on release (see beginRelease).
                     if (ability.getComboStyle() == ComboStyle.STRIKE) {
-                        playAnimation(user, ability);
+                        if (ability.getAnimation().hasChargeAnimation()) {
+                            playChargeAnimation(user, ability);
+                        } else {
+                            playAnimation(user, ability);
+                        }
                     }
 
                     if (ability.getMaxChargeTicks() > 0) {
@@ -259,6 +264,14 @@ public class AbilityManager {
                 new CastAnimationPayload(user.getId(), OtherWorlds.id(name), true));
     }
 
+    /** Starts the charge animation (for example an inhale). It should loop in its animation file. */
+    private static void playChargeAnimation(LivingEntity user, Ability ability) {
+        AnimationSpec spec = ability.getAnimation();
+        if (spec == null || !spec.hasChargeAnimation()) return;
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(user,
+                new CastAnimationPayload(user.getId(), OtherWorlds.id(spec.chargeName()), true));
+    }
+
     /** Tells every client that can see this entity to stop its cast animation. */
     private static void stopAnimation(LivingEntity user) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(user,
@@ -267,9 +280,16 @@ public class AbilityManager {
 
     // ---------- internals ----------
 
-    /** The combo (and charge) is done. Strike moves wait for their impact tick; others fire now. */
+    /**
+     * The combo (and charge) is done. Strike moves wait for their impact tick; others fire now.
+     * A move with a charge animation switches to its main animation here (the exhale).
+     */
     private static void beginRelease(LivingEntity user, ServerLevel level, CastTracker tracker, double charge) {
-        if (tracker.ability.getReleaseDelayTicks() > 0) {
+        Ability ability = tracker.ability;
+        if (ability.getComboStyle() == ComboStyle.STRIKE && ability.getAnimation().hasChargeAnimation()) {
+            playAnimation(user, ability);
+        }
+        if (ability.getReleaseDelayTicks() > 0) {
             tracker.charge = charge;
             tracker.phase = CastTracker.Phase.RELEASE_DELAY;
             tracker.ticks = 0;

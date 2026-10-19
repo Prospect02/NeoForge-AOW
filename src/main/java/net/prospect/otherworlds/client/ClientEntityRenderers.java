@@ -15,5 +15,7 @@ public class ClientEntityRenderers {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.BENDING_PROJECTILE.get(), NoopRenderer::new);
+        // No model yet: invisible, with a ring of cloud particles under it. The real model replaces this.
+        event.registerEntityRenderer(ModEntities.AIR_SCOOTER.get(), NoopRenderer::new);
     }
 }

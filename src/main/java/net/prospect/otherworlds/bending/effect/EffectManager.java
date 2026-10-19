@@ -24,6 +24,7 @@ public final class EffectManager {
 
     public static final ResourceLocation WIND_BUFFER = OtherWorlds.id("wind_buffer");
     public static final ResourceLocation WIND_RUN = OtherWorlds.id("wind_run");
+    public static final ResourceLocation CAST_SLOW = OtherWorlds.id("cast_slow");
 
     // Wind Buffer tuning. These move into Config later.
     private static final double BUFFER_ENGAGE_HEIGHT = 3.0;     // blocks above the ground
@@ -34,6 +35,10 @@ public final class EffectManager {
     private static final int WIND_RUN_RAMP_TICKS = 20;          // time to reach top speed
     private static final double WIND_RUN_CHI_PER_TICK = 0.3;
     private static final int FOOD_NEEDED_TO_SPRINT = 6;         // vanilla stops sprinting at 6 or less
+
+    // Cast slow. state.strength is the share of walking speed lost (0.25 = 25 percent slower).
+    private static final ResourceLocation CAST_SLOW_MODIFIER = OtherWorlds.id("cast_slow_speed");
+    private static final int CAST_SLOW_TICKS = 3;               // renewed every tick while casting, so it ends soon after
 
     public static void apply(LivingEntity entity, ResourceLocation id, int ticks, double strength) {
         entity.getData(ModAttachments.EFFECTS).add(id, ticks, strength);
@@ -50,6 +55,19 @@ public final class EffectManager {
             effects.remove(id);
             onRemoved(entity, id);
         }
+    }
+
+    /**
+     * Slows the entity while it casts. Call this every tick of the cast (for example from tickCasting and
+     * tickCharge): it runs out by itself a few ticks after the last call. fraction 0.25 is 25 percent slower.
+     */
+    public static void castSlow(LivingEntity entity, double fraction) {
+        apply(entity, CAST_SLOW, CAST_SLOW_TICKS, fraction);
+    }
+
+    /** Ends the cast slow right away, for when the move fires or the cast fails. */
+    public static void clearCastSlow(LivingEntity entity) {
+        remove(entity, CAST_SLOW);
     }
 
     public static void tick(LivingEntity entity) {
@@ -70,6 +88,7 @@ public final class EffectManager {
             boolean keep = true;
             if (id.equals(WIND_BUFFER)) keep = tickWindBuffer(entity, state);
             else if (id.equals(WIND_RUN)) keep = tickWindRun(entity, state);
+            else if (id.equals(CAST_SLOW)) keep = tickCastSlow(entity, state);
 
             if (!keep || --state.ticksLeft <= 0) {
                 effects.remove(id);
@@ -83,6 +102,9 @@ public final class EffectManager {
         if (id.equals(WIND_RUN)) {
             AttributeInstance speed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
             if (speed != null) speed.removeModifier(WIND_RUN_MODIFIER);
+        } else if (id.equals(CAST_SLOW)) {
+            AttributeInstance speed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
+            if (speed != null) speed.removeModifier(CAST_SLOW_MODIFIER);
         }
     }
 
@@ -147,6 +169,22 @@ public final class EffectManager {
         if (entity.tickCount % 2 == 0 && entity.level() instanceof ServerLevel level) {
             level.sendParticles(ParticleTypes.CLOUD, entity.getX(), entity.getY() + 0.1, entity.getZ(),
                     1, 0.2, 0.05, 0.2, 0.01);
+        }
+        return true;
+    }
+
+    // ---------- Cast slow ----------
+
+    /** Keeps the slow on. The modifier is only changed when the amount changes, so it isn't resent every tick. */
+    private static boolean tickCastSlow(LivingEntity entity, State state) {
+        AttributeInstance speed = entity.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed == null) return true;
+
+        double wanted = -state.strength;
+        AttributeModifier current = speed.getModifier(CAST_SLOW_MODIFIER);
+        if (current == null || Math.abs(current.amount() - wanted) > 1.0e-9) {
+            speed.addOrUpdateTransientModifier(new AttributeModifier(
+                    CAST_SLOW_MODIFIER, wanted, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
         }
         return true;
     }

@@ -21,5 +21,9 @@ public class ModNetwork {
                 ClientPayloadHandler::onCastState);
         registrar.playToClient(CastAnimationPayload.TYPE, CastAnimationPayload.STREAM_CODEC,
                 ClientPayloadHandler::onCastAnimation);
+        registrar.playToClient(CameraLockPayload.TYPE, CameraLockPayload.STREAM_CODEC,
+                ClientPayloadHandler::onCameraLock);
+        registrar.playToClient(WallStuckPayload.TYPE, WallStuckPayload.STREAM_CODEC,
+                ClientPayloadHandler::onWallStuck);
     }
 }

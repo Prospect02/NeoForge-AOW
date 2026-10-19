@@ -8,6 +8,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.projectile.BendingProjectile;
+import net.prospect.otherworlds.bending.scooter.AirScooterEntity;
 
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
@@ -24,6 +25,22 @@ public class ModEntities {
                             .noSummon()
                             .fireImmune()
                             .build("bending_projectile"));
+
+    /**
+     * The rideable ball of air for Air Scooter. Never saved to disk.
+     * 1.0 wide (so it still fits through a one block gap) and 0.9 tall. The rider's feet are at AirScooterEntity.RIDER_HEIGHT.
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<AirScooterEntity>> AIR_SCOOTER =
+            ENTITY_TYPES.register("air_scooter", () ->
+                    EntityType.Builder.<AirScooterEntity>of(AirScooterEntity::new, MobCategory.MISC)
+                            .sized(1.0f, 0.9f)
+                            .passengerAttachments(AirScooterEntity.RIDER_HEIGHT)
+                            .clientTrackingRange(10)
+                            .updateInterval(1)
+                            .noSave()
+                            .noSummon()
+                            .fireImmune()
+                            .build("air_scooter"));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);
