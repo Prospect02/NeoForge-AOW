@@ -23,6 +23,11 @@
   "ability.otherworlds.test_channel": "Test Channel",
   "ability.otherworlds.wind_jump": "Wind Jump",
   "ability.otherworlds.wind_run": "Wind Run",
-  "ability.otherworlds.wind_buffer": "Wind Buffer"
+  "ability.otherworlds.wind_buffer": "Wind Buffer",
+  "attribute.name.otherworlds.max_endurance": "Max Endurance",
+  "attribute.name.otherworlds.endurance_regen": "Endurance Regeneration",
+  "attribute.name.otherworlds.bending_protection": "Bending Protection",
+  "death.attack.otherworlds.bending": "%1$s was blown away by bending",
+  "death.attack.otherworlds.bending.player": "%1$s was blown away by %2$s's bending"
 }
 

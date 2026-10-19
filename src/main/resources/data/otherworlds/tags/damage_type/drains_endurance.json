@@ -1,0 +1,20 @@
+{
+  "values": [
+    "otherworlds:bending",
+    "minecraft:player_attack",
+    "minecraft:mob_attack",
+    "minecraft:mob_attack_no_aggro",
+    "minecraft:arrow",
+    "minecraft:trident",
+    "minecraft:thrown",
+    "minecraft:mob_projectile",
+    "minecraft:fireball",
+    "minecraft:unattributed_fireball",
+    "minecraft:wither_skull",
+    "minecraft:explosion",
+    "minecraft:player_explosion",
+    "minecraft:sting",
+    "minecraft:spit",
+    "minecraft:wind_charge"
+  ]
+}

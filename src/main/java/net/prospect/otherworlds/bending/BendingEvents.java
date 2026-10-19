@@ -12,29 +12,40 @@ import net.prospect.otherworlds.bending.ability.AbilityManager;
 import net.prospect.otherworlds.bending.ability.EndReason;
 import net.prospect.otherworlds.bending.chi.ChiHandler;
 import net.prospect.otherworlds.bending.effect.EffectManager;
+import net.prospect.otherworlds.bending.endurance.EnduranceHandler;
 
 @EventBusSubscriber(modid = OtherWorlds.MODID)
 public class BendingEvents {
 
     @SubscribeEvent
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) ChiHandler.initialize(player);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ChiHandler.initialize(player);
+            EnduranceHandler.initialize(player);
+        }
     }
 
     @SubscribeEvent
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) ChiHandler.onRespawn(player);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ChiHandler.onRespawn(player);
+            EnduranceHandler.onRespawn(player);
+        }
     }
 
     @SubscribeEvent
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) ChiHandler.refreshAttributes(player);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ChiHandler.refreshAttributes(player);
+            EnduranceHandler.refreshAttributes(player);
+        }
     }
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) return;
         ChiHandler.tick(player);
+        EnduranceHandler.tick(player);
         AbilityManager.tick(player);
         AbilityManager.sync(player);
         EffectManager.tick(player);
@@ -42,7 +53,8 @@ public class BendingEvents {
 
     @SubscribeEvent
     public static void onDamaged(LivingDamageEvent.Post event) {
-        if (event.getNewDamage() > 0) AbilityManager.onHurt(event.getEntity());
+        // Original damage, so a hit that Endurance fully absorbed still interrupts a cast
+        if (event.getOriginalDamage() > 0) AbilityManager.onHurt(event.getEntity());
     }
 
     @SubscribeEvent

@@ -26,6 +26,44 @@ public class Config {
             .comment("Chi per second of regeneration gained per chi level.")
             .defineInRange("chi.regenPerLevel", 0.1, 0.0, 100.0);
 
+    // --- Endurance (all values are damage points: 2 points = 1 heart) ---
+    public static final ModConfigSpec.IntValue ENDURANCE_VARIANCE_PERCENT = BUILDER
+            .comment("How far a player's natural max Endurance can differ from the base, in percent (0 turns it off).")
+            .defineInRange("endurance.maxVariancePercent", 10, 0, 50);
+
+    public static final ModConfigSpec.IntValue ENDURANCE_REGEN_VARIANCE_PERCENT = BUILDER
+            .comment("How far a player's natural Endurance regeneration can differ from the base, in percent.")
+            .defineInRange("endurance.regenVariancePercent", 3, 0, 50);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_PER_LEVEL = BUILDER
+            .comment("Max Endurance gained per Endurance level.")
+            .defineInRange("endurance.maxPerLevel", 2.0, 0.0, 1000.0);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_REGEN_PER_LEVEL = BUILDER
+            .comment("Endurance per second of regeneration gained per Endurance level.")
+            .defineInRange("endurance.regenPerLevel", 0.02, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_REGEN_DELAY_SECONDS = BUILDER
+            .comment("Seconds without taking combat damage before Endurance starts to regenerate.")
+            .defineInRange("endurance.regenDelaySeconds", 10.0, 0.0, 600.0);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_TRAINED_CAP = BUILDER
+            .comment("The most max Endurance that training (sparring, taking hits, using moves) can add.")
+            .defineInRange("endurance.trainedCap", 50.0, 1.0, 10000.0);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_TRAIN_PER_DAMAGE = BUILDER
+            .comment("Max Endurance trained per point of damage Endurance absorbs. Gains shrink as you near the cap.")
+            .defineInRange("endurance.trainPerDamage", 0.01, 0.0, 10.0);
+
+    // --- Bending damage ---
+    public static final ModConfigSpec.DoubleValue BENDING_VANILLA_ARMOR_FACTOR = BUILDER
+            .comment("How much vanilla armor counts against bending damage. 1.0 = same as any other damage, 0.0 = vanilla armor does nothing against bending. Lower it so custom Avatar armor can beat vanilla armor.")
+            .defineInRange("bending.vanillaArmorFactor", 1.0, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue MAX_BENDING_PROTECTION = BUILDER
+            .comment("The most bending damage the bending_protection attribute can cut (0.8 = 80 percent).")
+            .defineInRange("bending.maxProtection", 0.8, 0.0, 1.0);
+
     // Bending Config values above Spec
 
     static final ModConfigSpec SPEC = BUILDER.build();
