@@ -93,6 +93,103 @@ public class Config {
             .comment("When true, your bending never hurts your own tamed pets. When false (the default), bending can hurt anything.")
             .define("bending.protectTamedPets", false);
 
+    // --- Progression: general ---
+    public static final ModConfigSpec.BooleanValue HARDCORE_MODE = BUILDER
+            .comment("When true, dying wipes all progression: player level, element levels, move levels, learned moves, and the chi and Endurance levels they gave.")
+            .define("progression.hardcoreMode", false);
+
+    public static final ModConfigSpec.BooleanValue REQUIRE_LEARNED_MOVES = BUILDER
+            .comment("When true, a move can only be cast after it has been learned. Leave off until scrolls exist, so every move can be tested.")
+            .define("progression.requireLearnedMoves", false);
+
+    public static final ModConfigSpec.IntValue MASTER_LEVEL_DISCOUNT = BUILDER
+            .comment("A master teaches a move at this many element levels below what a scroll needs.")
+            .defineInRange("progression.masterLevelDiscount", 2, 0, 44);
+
+    // --- Progression: player level (earned by defeating opponents) ---
+    public static final ModConfigSpec.IntValue PLAYER_MAX_LEVEL = BUILDER
+            .comment("The highest player level.")
+            .defineInRange("progression.player.maxLevel", 30, 1, 200);
+
+    public static final ModConfigSpec.DoubleValue PLAYER_XP_BASE = BUILDER
+            .comment("XP to go from player level L to L+1 is base * L ^ exponent.")
+            .defineInRange("progression.player.xpBase", 100.0, 1.0, 1000000.0);
+
+    public static final ModConfigSpec.DoubleValue PLAYER_XP_EXPONENT = BUILDER
+            .comment("See xpBase.")
+            .defineInRange("progression.player.xpExponent", 1.5, 0.5, 4.0);
+
+    public static final ModConfigSpec.DoubleValue KILL_XP_PER_HEALTH = BUILDER
+            .comment("Player XP for defeating an opponent, per point of the opponent's max health (until mob levels exist).")
+            .defineInRange("progression.player.killXpPerHealth", 1.0, 0.0, 1000.0);
+
+    // --- Progression: element level (gates learning, gives no combat bonuses) ---
+    public static final ModConfigSpec.IntValue ELEMENT_MAX_LEVEL = BUILDER
+            .comment("The highest element level.")
+            .defineInRange("progression.element.maxLevel", 45, 1, 200);
+
+    public static final ModConfigSpec.DoubleValue ELEMENT_XP_BASE = BUILDER
+            .comment("XP to go from element level L to L+1 is base * L ^ exponent.")
+            .defineInRange("progression.element.xpBase", 60.0, 1.0, 1000000.0);
+
+    public static final ModConfigSpec.DoubleValue ELEMENT_XP_EXPONENT = BUILDER
+            .comment("See xpBase.")
+            .defineInRange("progression.element.xpExponent", 1.4, 0.5, 4.0);
+
+    public static final ModConfigSpec.DoubleValue ELEMENT_XP_PER_CAST = BUILDER
+            .comment("Element XP for a successful cast of a learned move.")
+            .defineInRange("progression.element.xpPerCast", 2.0, 0.0, 10000.0);
+
+    // --- Progression: move level ---
+    public static final ModConfigSpec.IntValue MOVE_SOFT_CAP = BUILDER
+            .comment("Move level that counts as fully mastered (Mastery 1.0). Levels past it still happen, but take far longer.")
+            .defineInRange("progression.move.softCap", 50, 2, 200);
+
+    public static final ModConfigSpec.IntValue MOVE_HARD_CAP = BUILDER
+            .comment("The highest possible move level.")
+            .defineInRange("progression.move.hardCap", 100, 2, 500);
+
+    public static final ModConfigSpec.DoubleValue MOVE_XP_BASE = BUILDER
+            .comment("XP to go from move level L to L+1 is base * L ^ exponent.")
+            .defineInRange("progression.move.xpBase", 40.0, 1.0, 1000000.0);
+
+    public static final ModConfigSpec.DoubleValue MOVE_XP_EXPONENT = BUILDER
+            .comment("See xpBase.")
+            .defineInRange("progression.move.xpExponent", 1.3, 0.5, 4.0);
+
+    public static final ModConfigSpec.DoubleValue MOVE_OVERFLOW_MULTIPLIER = BUILDER
+            .comment("Past the soft cap, the XP needed per level is multiplied by this.")
+            .defineInRange("progression.move.overflowMultiplier", 10.0, 1.0, 1000.0);
+
+    public static final ModConfigSpec.DoubleValue MOVE_XP_PER_CAST = BUILDER
+            .comment("Move XP for a successful cast.")
+            .defineInRange("progression.move.xpPerCast", 4.0, 0.0, 10000.0);
+
+    public static final ModConfigSpec.DoubleValue MOVE_XP_PER_SCROLL = BUILDER
+            .comment("Move XP for reading another scroll of a move that is already known.")
+            .defineInRange("progression.move.xpPerScroll", 150.0, 0.0, 100000.0);
+
+    // --- Progression: XP multipliers and anti-farming ---
+    public static final ModConfigSpec.DoubleValue HIT_XP_MULTIPLIER = BUILDER
+            .comment("A move that hits a real target gives this many times the XP of a plain cast.")
+            .defineInRange("progression.xp.hitMultiplier", 1.5, 1.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue TRAINING_XP_MULTIPLIER = BUILDER
+            .comment("XP multiplier while training or sparring.")
+            .defineInRange("progression.xp.trainingMultiplier", 2.0, 1.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue DIMINISH_RECOVER_SECONDS = BUILDER
+            .comment("Repeating a move builds up fatigue that lowers its XP. Each point of fatigue fades after this many seconds.")
+            .defineInRange("progression.xp.diminishRecoverSeconds", 6.0, 0.1, 600.0);
+
+    public static final ModConfigSpec.DoubleValue DIMINISH_STRENGTH = BUILDER
+            .comment("How hard fatigue cuts XP. The XP multiplier is 1 / (1 + fatigue * strength).")
+            .defineInRange("progression.xp.diminishStrength", 0.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue DIMINISH_MIN = BUILDER
+            .comment("The lowest the fatigue multiplier can go (0.1 = at least 10 percent of the XP).")
+            .defineInRange("progression.xp.diminishMin", 0.1, 0.0, 1.0);
+
     // Bending Config values above Spec
 
     static final ModConfigSpec SPEC = BUILDER.build();

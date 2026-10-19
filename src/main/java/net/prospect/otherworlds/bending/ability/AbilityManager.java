@@ -1,13 +1,16 @@
 package net.prospect.otherworlds.bending.ability;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.prospect.otherworlds.Config;
 import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.chi.ChiHandler;
+import net.prospect.otherworlds.bending.progression.Progression;
 import net.prospect.otherworlds.network.CastAnimationPayload;
 import net.prospect.otherworlds.network.CastStatePayload;
 import net.prospect.otherworlds.registry.ModAttachments;
@@ -49,7 +52,14 @@ public class AbilityManager {
             return AbilityResult.BUSY;
         }
 
-        // Later phases add "has this player learned the move?" checks here.
+        // Players can only cast moves they have learned, when the config asks for it.
+        if (user instanceof ServerPlayer learner && Config.REQUIRE_LEARNED_MOVES.get()
+                && !Progression.hasLearned(learner, ability)) {
+            learner.displayClientMessage(Component.literal("You haven't learned ")
+                    .append(ability.getDisplayName()).append("."), true);
+            return AbilityResult.FAILED;
+        }
+
         ResourceLocation id = ability.getId();
         if (!user.getData(ModAttachments.COOLDOWNS).isReady(id, level.getGameTime())) {
             return AbilityResult.ON_COOLDOWN;
@@ -310,7 +320,10 @@ public class AbilityManager {
             fail(user, FailReason.CANCELLED);
             return AbilityResult.FAILED;
         }
-        if (player != null) ChiHandler.trySpend(player, ability.getChiCost());
+        if (player != null) {
+            ChiHandler.trySpend(player, ability.getChiCost());
+            Progression.onCast(player, ability);   // move and element XP for a successful cast
+        }
 
         if (ability.getCastType() == CastType.INSTANT) {
             startCooldown(user, level, ability, ability.getCooldownTicks());

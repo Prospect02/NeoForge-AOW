@@ -12,6 +12,8 @@ import net.prospect.otherworlds.bending.data.BendingData;
 import net.prospect.otherworlds.bending.effect.ActiveEffects;
 import net.prospect.otherworlds.bending.endurance.EnduranceData;
 import net.prospect.otherworlds.bending.endurance.EnduranceState;
+import net.prospect.otherworlds.bending.progression.ProgressionData;
+import net.prospect.otherworlds.bending.progression.ProgressionState;
 
 public class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =
@@ -23,6 +25,20 @@ public class ModAttachments {
                             .serialize(BendingData.CODEC)  // saved with the player
                             .copyOnDeath()                 // kept when the player dies
                             .build());
+
+    // Progression: player level, element levels, move levels and learned moves. Saved, and kept on death
+    // (hardcore mode wipes it in BendingEvents.onClone).
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<ProgressionData>> PROGRESSION =
+            ATTACHMENT_TYPES.register("progression", () ->
+                    AttachmentType.builder(() -> ProgressionData.DEFAULT)
+                            .serialize(ProgressionData.CODEC)
+                            .copyOnDeath()
+                            .build());
+
+    // Not saved: move fatigue for the anti-spam XP reduction.
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<ProgressionState>> PROGRESSION_STATE =
+            ATTACHMENT_TYPES.register("progression_state", () ->
+                    AttachmentType.builder(ProgressionState::new).build());
 
     // Endurance: saved, and kept on death (the pool itself is refilled on respawn). Works on any living entity.
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<EnduranceData>> ENDURANCE =

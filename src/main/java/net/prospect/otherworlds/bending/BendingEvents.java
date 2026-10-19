@@ -7,12 +7,14 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.prospect.otherworlds.Config;
 import net.prospect.otherworlds.OtherWorlds;
 import net.prospect.otherworlds.bending.ability.AbilityManager;
 import net.prospect.otherworlds.bending.ability.EndReason;
 import net.prospect.otherworlds.bending.chi.ChiHandler;
 import net.prospect.otherworlds.bending.effect.EffectManager;
 import net.prospect.otherworlds.bending.endurance.EnduranceHandler;
+import net.prospect.otherworlds.bending.progression.Progression;
 
 @EventBusSubscriber(modid = OtherWorlds.MODID)
 public class BendingEvents {
@@ -23,6 +25,13 @@ public class BendingEvents {
             ChiHandler.initialize(player);
             EnduranceHandler.initialize(player);
         }
+    }
+
+    /** Hardcore mode: dying wipes progression. The data was just copied over, so reset the new body's copy. */
+    @SubscribeEvent
+    public static void onClone(PlayerEvent.Clone event) {
+        if (!event.isWasDeath() || !Config.HARDCORE_MODE.get()) return;
+        if (event.getEntity() instanceof ServerPlayer player) Progression.resetAll(player);
     }
 
     @SubscribeEvent
@@ -60,6 +69,10 @@ public class BendingEvents {
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent event) {
         AbilityManager.stop(event.getEntity(), EndReason.CANCELLED);
+        // Whoever landed the killing blow (a projectile counts as its owner) earns player XP
+        if (event.getSource().getEntity() instanceof ServerPlayer killer) {
+            Progression.onKill(killer, event.getEntity());
+        }
     }
 
     @SubscribeEvent

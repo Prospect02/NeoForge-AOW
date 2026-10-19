@@ -77,6 +77,8 @@ public abstract class Ability {
     /** Share of the chi cost lost on a wrong click or timeout. */
     public double getFailChiFraction() { return props.failChiFraction; }
     public AnimationSpec getAnimation() { return props.animation; }
+    /** Element level a player needs to learn this move from a scroll. A master asks for a little less. */
+    public int getRequiredElementLevel() { return props.requiredElementLevel; }
 
     /** Strike moves: ticks between "combo finished" and the effect landing. */
     public int getReleaseDelayTicks() {
@@ -127,6 +129,7 @@ public abstract class Ability {
         private boolean releaseOnLetGo = false;
         private double failChiFraction = 0.25;
         private AnimationSpec animation = AnimationSpec.NONE;
+        private int requiredElementLevel = 1;
 
         private Properties(Supplier<BendingStyle> style) { this.style = style; }
 
@@ -152,5 +155,7 @@ public abstract class Ability {
         }
         public Properties failChiFraction(double v) { this.failChiFraction = v; return this; }
         public Properties animation(AnimationSpec v) { this.animation = v; return this; }
+        /** Element level needed to learn the move from a scroll (1 to 45). Defaults to 1. */
+        public Properties requiredElementLevel(int v) { this.requiredElementLevel = Math.max(1, v); return this; }
     }
 }

@@ -1,0 +1,85 @@
+[chi]
+	#How far a player's natural max chi can differ from the base, in percent (0 turns it off).
+	# Default: 10
+	# Range: 0 ~ 50
+	maxChiVariancePercent = 10
+	#How far a player's natural chi regeneration can differ from the base, in percent (0 turns it off).
+	# Default: 3
+	# Range: 0 ~ 50
+	regenVariancePercent = 3
+	#How much the max-chi roll nudges max chi growth per level, in percent (0 turns it off).
+	# Default: 2
+	# Range: 0 ~ 50
+	maxChiGrowthVariancePercent = 2
+	#Max chi gained per chi level.
+	# Default: 5.0
+	# Range: 0.0 ~ 1000.0
+	maxChiPerLevel = 5.0
+	#Chi per second of regeneration gained per chi level.
+	# Default: 0.1
+	# Range: 0.0 ~ 100.0
+	regenPerLevel = 0.1
+
+[endurance]
+	#How far a player's natural max Endurance can differ from the base, in percent (0 turns it off).
+	# Default: 10
+	# Range: 0 ~ 50
+	maxVariancePercent = 10
+	#How far a player's natural Endurance regeneration can differ from the base, in percent.
+	# Default: 3
+	# Range: 0 ~ 50
+	regenVariancePercent = 3
+	#Max Endurance gained per Endurance level.
+	# Default: 2.0
+	# Range: 0.0 ~ 1000.0
+	maxPerLevel = 2.0
+	#Endurance per second of regeneration gained per Endurance level.
+	# Default: 0.02
+	# Range: 0.0 ~ 100.0
+	regenPerLevel = 0.02
+	#Seconds without taking combat damage before Endurance starts to regenerate.
+	# Default: 10.0
+	# Range: 0.0 ~ 600.0
+	regenDelaySeconds = 10.0
+	#The most max Endurance that training (sparring, taking hits, using moves) can add.
+	# Default: 50.0
+	# Range: 1.0 ~ 10000.0
+	trainedCap = 50.0
+	#Max Endurance trained per point of damage Endurance absorbs. Gains shrink as you near the cap.
+	# Default: 0.01
+	# Range: 0.0 ~ 10.0
+	trainPerDamage = 0.01
+
+	[endurance.food]
+		#Turns the food boost to Endurance regeneration on or off.
+		enabled = true
+		#Foods that are not listed in data/otherworlds/data_maps/item/endurance_food.json get a boost worked out from how filling they are.
+		fallbackEnabled = true
+		#Fallback: regen boost per point of food nutrition. 0.05 means a steak (8) gives +40 percent faster regeneration.
+		# Default: 0.05
+		# Range: 0.0 ~ 10.0
+		fallbackBoostPerNutrition = 0.05
+		#Fallback: seconds the boost lasts per point of food nutrition. 5.0 means a steak (8) lasts 40 seconds.
+		# Default: 5.0
+		# Range: 0.0 ~ 600.0
+		fallbackSecondsPerNutrition = 5.0
+		#The most any food can boost regeneration (3.0 means up to +300 percent faster).
+		# Default: 3.0
+		# Range: 0.0 ~ 100.0
+		maxBoost = 3.0
+
+[bending]
+	#How much vanilla armor counts against bending damage. 1.0 = same as any other damage, 0.0 = vanilla armor does nothing against bending. Lower it so custom Avatar armor can beat vanilla armor.
+	# Default: 1.0
+	# Range: 0.0 ~ 1.0
+	vanillaArmorFactor = 1.0
+	#The most bending damage the bending_protection attribute can cut (0.8 = 80 percent).
+	# Default: 0.8
+	# Range: 0.0 ~ 1.0
+	maxProtection = 0.8
+	#Scales the damage of every bending projectile (1.0 = as set on each move, 2.0 = double).
+	# Default: 1.0
+	# Range: 0.0 ~ 100.0
+	damageMultiplier = 1.0
+	#When true, your bending never hurts your own tamed pets. When false (the default), bending can hurt anything.
+	protectTamedPets = false
