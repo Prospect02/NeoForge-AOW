@@ -85,6 +85,14 @@ public class Config {
             .comment("The most bending damage the bending_protection attribute can cut (0.8 = 80 percent).")
             .defineInRange("bending.maxProtection", 0.8, 0.0, 1.0);
 
+    public static final ModConfigSpec.DoubleValue BENDING_DAMAGE_MULTIPLIER = BUILDER
+            .comment("Scales the damage of every bending projectile (1.0 = as set on each move, 2.0 = double).")
+            .defineInRange("bending.damageMultiplier", 1.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.BooleanValue BENDING_PROTECT_TAMED_PETS = BUILDER
+            .comment("When true, your bending never hurts your own tamed pets. When false (the default), bending can hurt anything.")
+            .define("bending.protectTamedPets", false);
+
     // Bending Config values above Spec
 
     static final ModConfigSpec SPEC = BUILDER.build();

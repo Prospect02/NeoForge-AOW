@@ -22,6 +22,7 @@ import net.prospect.otherworlds.item.ModItems;
 import net.prospect.otherworlds.network.ModNetwork;
 import net.prospect.otherworlds.registry.ModAttachments;
 import net.prospect.otherworlds.registry.ModAttributes;
+import net.prospect.otherworlds.registry.ModEntities;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -43,9 +44,10 @@ public class OtherWorlds {
         ModCreativeModeTabs.register(modEventBus);
         ModAttachments.register(modEventBus);
         ModAttributes.register(modEventBus);
+        ModEntities.register(modEventBus);
         ModNetwork.register(modEventBus);
 
-        if  (FMLEnvironment.dist == Dist.CLIENT) {
+        if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientAnimations.register(modEventBus);
         }
 
@@ -67,21 +69,7 @@ public class OtherWorlds {
         LOGGER.info("Registered abilities: {}", ModAbilities.REGISTRY.keySet().size());
     }
 
-public static ResourceLocation id(String path) {
+    public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
 }
