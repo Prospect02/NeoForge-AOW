@@ -1,5 +1,6 @@
 package net.prospect.otherworlds.bending.endurance;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
@@ -9,6 +10,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
 import net.prospect.otherworlds.Config;
 import net.prospect.otherworlds.OtherWorlds;
@@ -46,12 +49,25 @@ public final class EnduranceHandler {
         return 0.0;
     }
 
-    /** Points per second. */
+    /** Points per second, before any food boost. */
     public static double getRegen(LivingEntity entity) {
         AttributeInstance attribute = entity.getAttribute(ModAttributes.ENDURANCE_REGEN);
         if (attribute != null) return round2(attribute.getValue());
         if (entity instanceof EnduranceUser user) return round2(user.enduranceProfile().regenPerSecond());
         return 0.0;
+    }
+
+    /** The food boost that is running right now: 0 for none, 0.5 for regeneration 50 percent faster. */
+    public static double getRegenBoost(LivingEntity entity) {
+        EnduranceState state = entity.getData(ModAttachments.ENDURANCE_STATE);
+        if (entity.level().getGameTime() >= state.boostEndTick) return 0.0;
+        return state.regenBoost;
+    }
+
+    public static double getBoostSecondsLeft(LivingEntity entity) {
+        EnduranceState state = entity.getData(ModAttachments.ENDURANCE_STATE);
+        long left = state.boostEndTick - entity.level().getGameTime();
+        return left > 0 ? left / 20.0 : 0.0;
     }
 
     public static double getCurrent(LivingEntity entity) {
@@ -112,6 +128,48 @@ public final class EnduranceHandler {
         refreshAttributes(entity);
     }
 
+    // ---------- food ----------
+
+    /**
+     * Called when something finishes eating. A food listed in endurance_food.json uses its own numbers
+     * (0 means no boost). Any other food uses the config fallback, based on its nutrition.
+     */
+    public static void onEat(LivingEntity entity, ItemStack stack) {
+        if (!Config.ENDURANCE_FOOD_ENABLED.get() || !hasEndurance(entity) || stack.isEmpty()) return;
+
+        double boost;
+        double seconds;
+        EnduranceFood food = stack.getItemHolder().getData(ModDataMaps.ENDURANCE_FOOD);
+        if (food != null) {
+            boost = food.regenBoost();
+            seconds = food.durationSeconds();
+        } else if (Config.ENDURANCE_FOOD_FALLBACK_ENABLED.get()) {
+            FoodProperties props = stack.get(DataComponents.FOOD);
+            if (props == null) return;   // not food
+            boost = props.nutrition() * Config.ENDURANCE_FOOD_BOOST_PER_NUTRITION.get();
+            seconds = props.nutrition() * Config.ENDURANCE_FOOD_SECONDS_PER_NUTRITION.get();
+        } else {
+            return;
+        }
+
+        boost = Math.min(boost, Config.ENDURANCE_FOOD_MAX_BOOST.get());
+        if (boost <= 0.0 || seconds <= 0.0) return;
+        giveRegenBoost(entity, boost, seconds);
+    }
+
+    /**
+     * Starts a regen boost. Eating again refreshes the timer, and a weaker food never
+     * replaces a stronger boost that is still running.
+     */
+    public static void giveRegenBoost(LivingEntity entity, double boost, double seconds) {
+        EnduranceState state = entity.getData(ModAttachments.ENDURANCE_STATE);
+        long now = entity.level().getGameTime();
+        double active = getRegenBoost(entity);
+        if (active > 0.0 && boost < active) return;
+        state.regenBoost = boost;
+        state.boostEndTick = now + Math.round(seconds * 20.0);
+    }
+
     // ---------- lifecycle ----------
 
     /** Call on login (players) or on spawn (NPCs). Rolls on first join, applies the attributes, fills the pool. */
@@ -139,10 +197,13 @@ public final class EnduranceHandler {
         }
     }
 
-    /** Call after respawn. Refills the pool and ends any spar. */
+    /** Call after respawn. Refills the pool, ends any spar and any food boost. */
     public static void onRespawn(LivingEntity entity) {
         if (!hasEndurance(entity)) return;
-        setSparring(entity, false);
+        EnduranceState state = entity.getData(ModAttachments.ENDURANCE_STATE);
+        state.sparring = false;
+        state.regenBoost = 0.0;
+        state.boostEndTick = 0L;
         refreshAttributes(entity);
         setCurrent(entity, getMax(entity));
     }
@@ -188,7 +249,8 @@ public final class EnduranceHandler {
         double delayTicks = Config.ENDURANCE_REGEN_DELAY_SECONDS.get() * 20.0;
         if (entity.level().getGameTime() - state.lastHitTick < delayTicks) return;
 
-        setCurrent(entity, current + getRegen(entity) / 20.0);   // 20 ticks per second
+        double perSecond = getRegen(entity) * (1.0 + getRegenBoost(entity));   // food boost speeds it up
+        setCurrent(entity, current + perSecond / 20.0);   // 20 ticks per second
     }
 
     // ---------- damage ----------

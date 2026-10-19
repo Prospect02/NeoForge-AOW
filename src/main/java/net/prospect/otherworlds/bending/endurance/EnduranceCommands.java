@@ -86,13 +86,18 @@ public class EnduranceCommands {
         else if (sinceHit < delayTicks) regen = String.format("waiting %.1fs", (delayTicks - sinceHit) / 20.0);
         else regen = "regenerating";
 
+        double boost = EnduranceHandler.getRegenBoost(player);
+        String food = boost > 0.0
+                ? String.format("food boost +%.0f%% for %.0fs more", boost * 100.0, EnduranceHandler.getBoostSecondsLeft(player))
+                : "no food boost";
+
         send(source, String.format("Endurance: %.2f / %.2f  (damage stage %d of %d)",
                 current, max, EnduranceHandler.getStage(player), EnduranceHandler.STAGES));
         send(source, String.format("Level %d, trained +%.2f (cap %.2f), rolls: max %+.0f%% regen %+.0f%%",
                 data.level(), data.trained(), Config.ENDURANCE_TRAINED_CAP.get(),
                 data.maxRoll() * Config.ENDURANCE_VARIANCE_PERCENT.get(),
                 data.regenRoll() * Config.ENDURANCE_REGEN_VARIANCE_PERCENT.get()));
-        send(source, String.format("Regen: %.2f/s, %s", EnduranceHandler.getRegen(player), regen));
+        send(source, String.format("Regen: %.2f/s, %s, %s", EnduranceHandler.getRegen(player), regen, food));
         send(source, String.format("Last hit: %.2f after armor, Endurance took %.2f",
                 state.lastIncoming, state.lastAbsorbed));
         send(source, "Spar mode: " + (state.sparring ? "ON (hearts untouchable)" : "off"));

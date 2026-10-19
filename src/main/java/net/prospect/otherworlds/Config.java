@@ -55,6 +55,27 @@ public class Config {
             .comment("Max Endurance trained per point of damage Endurance absorbs. Gains shrink as you near the cap.")
             .defineInRange("endurance.trainPerDamage", 0.01, 0.0, 10.0);
 
+    // --- Endurance food boosts ---
+    public static final ModConfigSpec.BooleanValue ENDURANCE_FOOD_ENABLED = BUILDER
+            .comment("Turns the food boost to Endurance regeneration on or off.")
+            .define("endurance.food.enabled", true);
+
+    public static final ModConfigSpec.BooleanValue ENDURANCE_FOOD_FALLBACK_ENABLED = BUILDER
+            .comment("Foods that are not listed in data/otherworlds/data_maps/item/endurance_food.json get a boost worked out from how filling they are.")
+            .define("endurance.food.fallbackEnabled", true);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_FOOD_BOOST_PER_NUTRITION = BUILDER
+            .comment("Fallback: regen boost per point of food nutrition. 0.05 means a steak (8) gives +40 percent faster regeneration.")
+            .defineInRange("endurance.food.fallbackBoostPerNutrition", 0.05, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_FOOD_SECONDS_PER_NUTRITION = BUILDER
+            .comment("Fallback: seconds the boost lasts per point of food nutrition. 5.0 means a steak (8) lasts 40 seconds.")
+            .defineInRange("endurance.food.fallbackSecondsPerNutrition", 5.0, 0.0, 600.0);
+
+    public static final ModConfigSpec.DoubleValue ENDURANCE_FOOD_MAX_BOOST = BUILDER
+            .comment("The most any food can boost regeneration (3.0 means up to +300 percent faster).")
+            .defineInRange("endurance.food.maxBoost", 3.0, 0.0, 100.0);
+
     // --- Bending damage ---
     public static final ModConfigSpec.DoubleValue BENDING_VANILLA_ARMOR_FACTOR = BUILDER
             .comment("How much vanilla armor counts against bending damage. 1.0 = same as any other damage, 0.0 = vanilla armor does nothing against bending. Lower it so custom Avatar armor can beat vanilla armor.")

@@ -1,0 +1,12 @@
+{
+  "values": {
+    "minecraft:apple": { "regen_boost": 0.15, "duration_seconds": 20 },
+    "minecraft:bread": { "regen_boost": 0.25, "duration_seconds": 30 },
+    "minecraft:cooked_beef": { "regen_boost": 0.5, "duration_seconds": 45 },
+    "minecraft:cooked_porkchop": { "regen_boost": 0.5, "duration_seconds": 45 },
+    "minecraft:golden_carrot": { "regen_boost": 0.6, "duration_seconds": 60 },
+    "minecraft:golden_apple": { "regen_boost": 1.0, "duration_seconds": 60 },
+    "minecraft:enchanted_golden_apple": { "regen_boost": 2.0, "duration_seconds": 120 },
+    "minecraft:rotten_flesh": { "regen_boost": 0.0, "duration_seconds": 0 }
+  }
+}
